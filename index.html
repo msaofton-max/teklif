@@ -21,244 +21,83 @@
     --body-font: 'IBM Plex Sans', sans-serif;
     --mono: 'IBM Plex Mono', monospace;
   }
-
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body{ margin:0; padding:0; height:100%; background: var(--paper); color: var(--ink); font-family: var(--body-font); overflow: hidden; -webkit-font-smoothing: antialiased; }
+  body{ position: relative; height: 100vh; height: 100dvh; width: 100%; }
 
-  html, body{
-    margin:0; padding:0; height:100%;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--body-font);
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body{
-    position: relative;
-    height: 100vh;
-    height: 100dvh;
-    width: 100%;
-  }
-
-  /* ambient signature: a slow-turning wedge of shadow, like a sundial through a lunch hour */
   .gnomon{
-    position: fixed;
-    top: -40vh; left: 50%;
-    width: 220vh; height: 220vh;
-    transform-origin: 50% 100%;
-    transform: translateX(-50%) rotate(0deg);
+    position: fixed; top: -40vh; left: 50%; width: 220vh; height: 220vh;
+    transform-origin: 50% 100%; transform: translateX(-50%) rotate(0deg);
     background: conic-gradient(from 0deg, transparent 0deg, rgba(51,73,90,0.07) 6deg, transparent 14deg);
-    pointer-events: none;
-    z-index: 0;
-    animation: sweep 90s linear infinite;
-    mix-blend-mode: multiply;
+    pointer-events: none; z-index: 0; animation: sweep 90s linear infinite; mix-blend-mode: multiply;
   }
   @keyframes sweep{ to{ transform: translateX(-50%) rotate(360deg); } }
   @media (prefers-reduced-motion: reduce){ .gnomon{ animation: none; } }
 
-  .stage{
-    position: relative;
-    z-index: 1;
-    height: 100%;
-    width: 100%;
-  }
+  .stage{ position: relative; z-index: 1; height: 100%; width: 100%; }
 
   .screen{
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
+    position: absolute; inset: 0; display: flex; flex-direction: column;
     padding: max(28px, env(safe-area-inset-top)) 26px max(24px, env(safe-area-inset-bottom));
-    opacity: 0;
-    transform: translateY(14px);
-    pointer-events: none;
+    opacity: 0; transform: translateY(14px); pointer-events: none;
     transition: opacity .45s ease, transform .45s ease;
   }
-  .screen.active{
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
+  .screen.active{ opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+  .close-btn{
+    position: fixed; top: max(16px, env(safe-area-inset-top)); right: 16px;
+    width: 36px; height: 36px; border-radius: 50%; background: rgba(33,29,24,0.07);
+    border: none; color: var(--ink-soft); font-size: 20px; line-height: 1;
+    display: flex; align-items: center; justify-content: center; z-index: 5; padding: 0;
   }
 
-  .eyebrow{
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--shadow);
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
+  .content{ flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; min-height: 0; }
 
-  .content{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 18px;
-    min-height: 0;
-  }
+  h1{ font-family: var(--display); font-weight: 400; font-style: normal; font-size: clamp(28px, 7.6vw, 38px); line-height: 1.14; margin: 0; color: var(--ink); }
+  .sub{ font-size: 15.5px; line-height: 1.5; color: var(--ink-soft); margin: 0; max-width: 34ch; }
 
-  h1{
-    font-family: var(--display);
-    font-weight: 400;
-    font-style: normal;
-    font-size: clamp(30px, 8.2vw, 40px);
-    line-height: 1.12;
-    margin: 0;
-    color: var(--ink);
-  }
+  .actions{ display: flex; gap: 12px; margin-top: 6px; }
 
-  .sub{
-    font-size: 15.5px;
-    line-height: 1.5;
-    color: var(--ink-soft);
-    margin: 0;
-    max-width: 34ch;
-  }
-
-  .actions{
-    display: flex;
-    gap: 12px;
-    margin-top: 6px;
-  }
-
-  button{
-    font-family: var(--body-font);
-    font-size: 15px;
-    font-weight: 500;
-    border-radius: 999px;
-    padding: 15px 22px;
-    border: 1.5px solid transparent;
-    cursor: pointer;
-    transition: transform .15s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
-  }
+  button{ font-family: var(--body-font); font-size: 15px; font-weight: 500; border-radius: 999px; padding: 15px 22px; border: 1.5px solid transparent; cursor: pointer; transition: transform .15s ease, background .2s ease, border-color .2s ease, opacity .2s ease; }
   button:active{ transform: scale(0.96); }
   button:focus-visible{ outline: 2px solid var(--shadow); outline-offset: 3px; }
 
-  .btn-primary{
-    background: var(--sun);
-    color: #FBF6EF;
-    flex: 1.3;
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-primary:disabled{
-    background: var(--line);
-    color: #8b8272;
-    cursor: not-allowed;
-  }
-  .btn-ghost{
-    background: transparent;
-    border-color: var(--line);
-    color: var(--ink-soft);
-    flex: 1;
-  }
+  .btn-primary{ background: var(--sun); color: #FBF6EF; flex: 1.3; position: relative; overflow: hidden; }
+  .btn-ghost{ background: transparent; border-color: var(--line); color: var(--ink-soft); flex: 1; }
 
-  /* small delight burst on a genuine "yes" tap — no coercion, just texture */
-  .btn-primary.pulse::after{
-    content:'';
-    position:absolute; inset:0;
-    background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, transparent 60%);
-    animation: burst .55s ease-out;
-  }
+  .btn-primary.pulse::after{ content:''; position:absolute; inset:0; background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, transparent 60%); animation: burst .55s ease-out; }
   @keyframes burst{ from{ opacity:1; transform: scale(0.2);} to{ opacity:0; transform: scale(2.2);} }
 
-  .close-btn{
-    position: fixed;
-    top: max(16px, env(safe-area-inset-top));
-    right: 16px;
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: rgba(33,29,24,0.07);
-    border: none;
-    color: var(--ink-soft);
-    font-size: 20px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 5;
-    padding: 0;
-  }
-
-  .footer-links{
-    text-align: center;
-    margin-top: 14px;
-  }
-  .link-quiet{
-    background: none; border: none; padding: 6px;
-    font-size: 13.5px; color: var(--ink-soft);
-    text-decoration: underline; text-underline-offset: 3px;
-  }
+  .footer-links{ text-align: center; margin-top: 14px; }
+  .link-quiet{ background: none; border: none; padding: 6px; font-size: 13.5px; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
 
   .cards{ display:flex; flex-direction:column; gap:10px; }
-  .pickcard{
-    display:flex; align-items:center; gap:12px;
-    padding: 16px 16px;
-    border-radius: 16px;
-    border: 1.5px solid var(--line);
-    background: var(--paper-deep);
-    font-family: var(--body-font);
-    font-size: 16px;
-    color: var(--ink);
-    text-align:left;
-    cursor:pointer;
-  }
+  .pickcard{ display:flex; align-items:center; gap:12px; padding: 16px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--paper-deep); font-family: var(--body-font); font-size: 16px; color: var(--ink); text-align:left; cursor:pointer; }
   .pickcard .emoji{ font-size: 22px; }
-  .pickcard.selected{
-    border-color: var(--sun);
-    background: var(--sun-soft);
-  }
+  .pickcard.selected{ border-color: var(--sun); background: var(--sun-soft); }
+  .pickcard.joke{ opacity: 0.9; }
 
   .field{ display:flex; flex-direction:column; gap:8px; }
-  .field label{
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--shadow);
-  }
-  input[type="date"], input[type="time"], input[type="text"]{
-    font-family: var(--body-font);
-    font-size: 16px;
-    padding: 14px 14px;
-    border-radius: 12px;
-    border: 1.5px solid var(--line);
-    background: var(--paper-deep);
-    color: var(--ink);
-    width: 100%;
-  }
+  .field label{ font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--shadow); }
+  input[type="time"]{ font-family: var(--body-font); font-size: 16px; padding: 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--paper-deep); color: var(--ink); width: 100%; }
   input:focus-visible{ outline: 2px solid var(--shadow); outline-offset: 2px; }
 
-  .ticket{
-    border: 1.5px dashed var(--line);
-    border-radius: 16px;
-    padding: 18px;
-    background: var(--paper-deep);
-    display:flex; flex-direction:column; gap:10px;
+  .days-row{ display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x proximity; padding-bottom:4px; }
+  .day-pill{
+    scroll-snap-align:start; flex: 0 0 auto; min-width: 64px; padding: 12px 10px; border-radius: 14px;
+    border: 1.5px solid var(--line); background: var(--paper-deep); text-align:center; cursor:pointer;
   }
-  .ticket-row{
-    display:flex; justify-content:space-between; gap:12px;
-    font-size: 14.5px;
-  }
-  .ticket-row .k{ color: var(--ink-soft); font-family: var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; padding-top:2px;}
+  .day-pill .dname{ font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing:.05em; color: var(--ink-soft); }
+  .day-pill .dnum{ font-family: var(--display); font-size: 22px; margin-top:2px; }
+  .day-pill.selected{ border-color: var(--sun); background: var(--sun-soft); }
+
+  .ticket{ border: 1.5px dashed var(--line); border-radius: 16px; padding: 18px; background: var(--paper-deep); display:flex; flex-direction:column; gap:10px; }
+  .ticket-row{ display:flex; justify-content:space-between; gap:12px; font-size: 14.5px; }
+  .ticket-row .k{ color: var(--ink-soft); font-family: var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; padding-top:2px; }
   .ticket-row .v{ text-align:right; font-weight:500; }
 
-  .note{
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    text-align:center;
-    line-height:1.5;
-  }
-
-  .decline-wrap{
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 10px;
-  }
+  .note{ font-size: 12.5px; color: var(--ink-soft); text-align:center; line-height:1.5; }
+  .decline-wrap{ justify-content: center; align-items: center; text-align: center; gap: 10px; }
 </style>
 </head>
 <body>
@@ -271,11 +110,11 @@
   <section class="screen active" data-screen="intro">
     <button class="close-btn" data-decline type="button" aria-label="Kapat">×</button>
     <div class="content">
-      <h1>Seninle tanışmak istiyorum.</h1>
-      <p class="sub">Bunu yazacak cesareti ancak burada bulabildim. Bir şans verir misin?</p>
+      <h1>Tekrar Selam :)) Mesajımı okuyup buraya geldiğin için teşekkürler</h1>
+      <p class="sub">Senin için de uygun bir zamanda görüşebilir miyiz?</p>
       <div class="actions">
-        <button class="btn-ghost" id="btnNo" type="button">Hayır, sağ ol</button>
-        <button class="btn-primary" id="btnYes" type="button">Evet, olur</button>
+        <button class="btn-ghost" id="btnNo" type="button">Nope 😒</button>
+        <button class="btn-primary" id="btnYes" type="button">Neden olmasın? 🥳</button>
       </div>
     </div>
   </section>
@@ -283,7 +122,7 @@
   <!-- 1b — nazik çıkış -->
   <section class="screen decline-wrap" data-screen="decline">
     <div class="content decline-wrap">
-      <h1>Anladım.</h1>
+      <h1>Oky 😔</h1>
       <p class="sub">Vaktini aldığım için teşekkür ederim. İyi günler dilerim.</p>
     </div>
   </section>
@@ -292,16 +131,13 @@
   <section class="screen" data-screen="type">
     <button class="close-btn" data-decline type="button" aria-label="Kapat">×</button>
     <div class="content">
-      <h1>Ne dersin?</h1>
-      <p class="sub">Hangisi sana daha keyifli gelir?</p>
+      <h1>Yaa, evet dediiin 🥹🥰</h1>
+      <p class="sub">Nasıl bir yer tercih edersin?</p>
       <div class="cards" id="typeCards">
         <button class="pickcard" data-value="Kahve" type="button"><span class="emoji">☕</span>Kahve</button>
         <button class="pickcard" data-value="Yemek" type="button"><span class="emoji">🍽️</span>Yemek</button>
-        <button class="pickcard" data-value="Yürüyüş" type="button"><span class="emoji">🚶</span>Yürüyüş</button>
-      </div>
-      <div class="actions">
-        <button class="btn-ghost" data-back type="button">Geri</button>
-        <button class="btn-primary" id="btnTypeNext" type="button" disabled>Devam et</button>
+        <button class="pickcard" data-value="Yürüyüş" type="button"><span class="emoji">👫</span>Yürüyüş</button>
+        <button class="pickcard joke" id="jokeCard" type="button"><span class="emoji">🪂</span><span id="jokeText">bungee jumping</span></button>
       </div>
     </div>
   </section>
@@ -310,37 +146,26 @@
   <section class="screen" data-screen="datetime">
     <button class="close-btn" data-decline type="button" aria-label="Kapat">×</button>
     <div class="content">
-      <h1>Ne zaman uygun olur?</h1>
+      <h1>Senin için ne zaman uygun?</h1>
       <p class="sub">Sana en rahat gelen günü ve saati seç.</p>
       <div class="field">
-        <label for="inpDate">Gün</label>
-        <input type="date" id="inpDate">
+        <label>Gün</label>
+        <div class="days-row" id="daysRow"></div>
       </div>
       <div class="field">
         <label for="inpTime">Saat</label>
         <input type="time" id="inpTime">
       </div>
-      <div class="actions">
-        <button class="btn-ghost" data-back type="button">Geri</button>
-        <button class="btn-primary" id="btnDateNext" type="button" disabled>Devam et</button>
-      </div>
     </div>
   </section>
 
-  <!-- 4 — iletişim -->
-  <section class="screen" data-screen="contact">
+  <!-- 4 — yer seçimi -->
+  <section class="screen" data-screen="venue">
     <button class="close-btn" data-decline type="button" aria-label="Kapat">×</button>
     <div class="content">
-      <h1>Sana nasıl ulaşabilirim?</h1>
-      <p class="sub">İstersen bu adımı boş bırakabilirsin, sorun değil.</p>
-      <div class="field">
-        <label for="inpContact">Telefon, Instagram, ne istersen</label>
-        <input type="text" id="inpContact" placeholder="isteğe bağlı">
-      </div>
-      <div class="actions">
-        <button class="btn-ghost" data-back type="button">Geri</button>
-        <button class="btn-primary" id="btnContactNext" type="button">Devam et</button>
-      </div>
+      <h1>Nerede buluşalım? 📍</h1>
+      <p class="sub">Seçimine göre üç öneri:</p>
+      <div class="cards" id="venueCards"></div>
     </div>
   </section>
 
@@ -348,18 +173,16 @@
   <section class="screen" data-screen="summary">
     <button class="close-btn" data-decline type="button" aria-label="Kapat">×</button>
     <div class="content">
-      <h1>Hazır.</h1>
+      <h1>🥳🥳🥳</h1>
       <div class="ticket" id="ticketBox">
-        <div class="ticket-row"><span class="k">Ne</span><span class="v" id="sumType">—</span></div>
-        <div class="ticket-row"><span class="k">Gün</span><span class="v" id="sumDate">—</span></div>
-        <div class="ticket-row"><span class="k">Saat</span><span class="v" id="sumTime">—</span></div>
-        <div class="ticket-row"><span class="k">İletişim</span><span class="v" id="sumContact">—</span></div>
+        <div class="ticket-row"><span class="k">Gün</span><span class="v" id="sumGun">—</span></div>
+        <div class="ticket-row"><span class="k">Saat</span><span class="v" id="sumSaat">—</span></div>
+        <div class="ticket-row"><span class="k">Yer</span><span class="v" id="sumYer">—</span></div>
       </div>
       <div class="actions">
-        <button class="btn-ghost" id="btnCopy" type="button">Mesajı kopyala</button>
-        <button class="btn-primary" id="btnSend" type="button">WhatsApp'ta gönder</button>
+        <button class="btn-primary" id="btnInstagram" type="button" style="flex:1;">İnstagramdan gönder 😀</button>
       </div>
-      <p class="note">Göndermeden önce mesajı WhatsApp içinde düzenleyebilir ya da vazgeçebilirsin. Karar tamamen sende.</p>
+      <p class="note">Göndermeden önce mesajı Instagram'da düzenleyebilir ya da vazgeçebilirsin. Karar tamamen sende.</p>
       <div class="footer-links"><button class="link-quiet" data-back type="button">Geri dön</button></div>
     </div>
   </section>
@@ -367,26 +190,28 @@
 </div>
 
 <script>
-  // ↓ Kendi WhatsApp numaranı ülke koduyla (başında + olmadan) buraya yaz, örn: "905551234567"
-  const CONFIG = { whatsappNumber: "90XXXXXXXXXX" };
+  const IG_USERNAME = "altanmsa";
 
-  const state = { type: null, date: null, time: null, contact: '' };
-  const order = ['intro','type','datetime','contact','summary'];
-  const screens = Object.fromEntries(
-    [...document.querySelectorAll('.screen')].map(s => [s.dataset.screen, s])
-  );
+  const VENUE_OPTIONS = {
+    'Kahve': ['Kıtır', 'Labebe', 'Budakaltı'],
+    'Yemek': ['Varuna', 'Louise', 'ChefBros'],
+    'Yürüyüş': ['Seğmenler Parkı', 'Kuğulu Park', 'Tunus Caddesi']
+  };
+  const TYPE_EMOJI = { 'Kahve':'☕', 'Yemek':'🍽️', 'Yürüyüş':'👫' };
+
+  const state = { type: null, date: null, time: null, venue: null };
+  const order = ['intro','type','datetime','venue','summary'];
+  const screens = Object.fromEntries([...document.querySelectorAll('.screen')].map(s => [s.dataset.screen, s]));
 
   function show(name){
     Object.values(screens).forEach(s => s.classList.remove('active'));
     screens[name].classList.add('active');
   }
-
   function back(){
     const current = document.querySelector('.screen.active').dataset.screen;
     const idx = order.indexOf(current);
     if (idx > 0) show(order[idx - 1]);
   }
-
   document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', back));
   document.querySelectorAll('[data-decline]').forEach(b => b.addEventListener('click', () => show('decline')));
 
@@ -397,39 +222,86 @@
     setTimeout(() => show('type'), 260);
   });
 
-  // ekran 2 — tür seçimi
-  const typeCards = document.querySelectorAll('#typeCards .pickcard');
-  const btnTypeNext = document.getElementById('btnTypeNext');
-  typeCards.forEach(card => card.addEventListener('click', () => {
-    typeCards.forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    state.type = card.dataset.value;
-    btnTypeNext.disabled = false;
-  }));
-  btnTypeNext.addEventListener('click', () => show('datetime'));
+  // ekran 2 — tür seçimi (seçim = ilerleme)
+  document.querySelectorAll('#typeCards .pickcard:not(.joke)').forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.add('selected');
+      state.type = card.dataset.value;
+      renderVenueCards();
+      setTimeout(() => show('datetime'), 280);
+    });
+  });
+  const jokeCard = document.getElementById('jokeCard');
+  const jokeText = document.getElementById('jokeText');
+  let jokeBusy = false;
+  jokeCard.addEventListener('click', () => {
+    if (jokeBusy) return;
+    jokeBusy = true;
+    const original = jokeText.textContent;
+    jokeText.textContent = 'lütfen korkutma beni 😅';
+    setTimeout(() => { jokeText.textContent = original; jokeBusy = false; }, 2200);
+  });
 
-  // ekran 3 — tarih/saat
-  const inpDate = document.getElementById('inpDate');
+  // ekran 3 — tarih / saat
+  function getNextDays(n){
+    const dayNames = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+    const days = [];
+    const now = new Date();
+    for(let i=0;i<n;i++){
+      const d = new Date(now);
+      d.setDate(now.getDate()+i);
+      const iso = d.toISOString().split('T')[0];
+      const label = i===0 ? 'Bugün' : dayNames[d.getDay()];
+      days.push({ iso, label, num: d.getDate() });
+    }
+    return days;
+  }
+  const daysRow = document.getElementById('daysRow');
+  getNextDays(5).forEach(d => {
+    const el = document.createElement('button');
+    el.className = 'day-pill';
+    el.type = 'button';
+    el.innerHTML = `<div class="dname">${d.label}</div><div class="dnum">${d.num}</div>`;
+    el.addEventListener('click', () => {
+      daysRow.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+      state.date = d.iso;
+      maybeAdvanceFromDatetime();
+    });
+    daysRow.appendChild(el);
+  });
   const inpTime = document.getElementById('inpTime');
-  const btnDateNext = document.getElementById('btnDateNext');
-  const today = new Date().toISOString().split('T')[0];
-  inpDate.min = today;
-  function checkDateTime(){ btnDateNext.disabled = !(inpDate.value && inpTime.value); }
-  inpDate.addEventListener('input', checkDateTime);
-  inpTime.addEventListener('input', checkDateTime);
-  btnDateNext.addEventListener('click', () => {
-    state.date = inpDate.value;
+  inpTime.addEventListener('change', () => {
     state.time = inpTime.value;
-    show('contact');
+    maybeAdvanceFromDatetime();
   });
+  function maybeAdvanceFromDatetime(){
+    if (state.date && state.time){
+      setTimeout(() => show('venue'), 350);
+    }
+  }
 
-  // ekran 4 — iletişim (opsiyonel)
-  const inpContact = document.getElementById('inpContact');
-  document.getElementById('btnContactNext').addEventListener('click', () => {
-    state.contact = inpContact.value.trim();
-    fillSummary();
-    show('summary');
-  });
+  // ekran 4 — yer seçimi
+  const venueCards = document.getElementById('venueCards');
+  function renderVenueCards(){
+    venueCards.innerHTML = '';
+    const options = VENUE_OPTIONS[state.type] || [];
+    const emoji = TYPE_EMOJI[state.type] || '📍';
+    options.forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = 'pickcard';
+      btn.type = 'button';
+      btn.innerHTML = `<span class="emoji">${emoji}</span>${name}`;
+      btn.addEventListener('click', () => {
+        venueCards.querySelectorAll('.pickcard').forEach(c => c.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.venue = name;
+        fillSummary();
+        setTimeout(() => show('summary'), 280);
+      });
+      venueCards.appendChild(btn);
+    });
+  }
 
   // ekran 5 — özet
   function formatDate(iso){
@@ -438,29 +310,22 @@
     return d.toLocaleDateString('tr-TR', { day:'numeric', month:'long', weekday:'long' });
   }
   function fillSummary(){
-    document.getElementById('sumType').textContent = state.type || '—';
-    document.getElementById('sumDate').textContent = formatDate(state.date);
-    document.getElementById('sumTime').textContent = state.time || '—';
-    document.getElementById('sumContact').textContent = state.contact || 'paylaşılmadı';
+    document.getElementById('sumGun').textContent = formatDate(state.date);
+    document.getElementById('sumSaat').textContent = state.time || '—';
+    document.getElementById('sumYer').textContent = state.venue || '—';
   }
   function buildMessage(){
-    let msg = `Merhaba! Bugün öğle arası karşılaştığımız kişiyim. `;
-    msg += `${state.type || 'Buluşmak'} için ${formatDate(state.date)}, saat ${state.time || '—'} bana uyar.`;
-    if (state.contact) msg += ` Bana buradan ulaşabilirsin: ${state.contact}`;
-    return msg;
+    return `Merhaba! 🥳 ${formatDate(state.date)}, saat ${state.time || '—'} için ${state.venue || '—'} bana uyar!`;
   }
-  document.getElementById('btnSend').addEventListener('click', () => {
-    const text = encodeURIComponent(buildMessage());
-    window.location.href = `https://wa.me/${CONFIG.whatsappNumber}?text=${text}`;
-  });
-  document.getElementById('btnCopy').addEventListener('click', async (e) => {
-    try{
-      await navigator.clipboard.writeText(buildMessage());
-      const btn = e.currentTarget;
-      const old = btn.textContent;
-      btn.textContent = 'Kopyalandı ✓';
-      setTimeout(() => btn.textContent = old, 1500);
-    }catch(err){ /* sessizce yut, kritik değil */ }
+  document.getElementById('btnInstagram').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const old = btn.textContent;
+    try { await navigator.clipboard.writeText(buildMessage()); } catch(err) { /* sessizce yut */ }
+    btn.textContent = 'Kopyalandı, Instagram açılıyor…';
+    setTimeout(() => {
+      window.location.href = `https://ig.me/m/${IG_USERNAME}`;
+      btn.textContent = old;
+    }, 600);
   });
 </script>
 
