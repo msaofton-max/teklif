@@ -153,8 +153,8 @@
         <div class="days-row" id="daysRow"></div>
       </div>
       <div class="field">
-        <label for="inpTime">Saat</label>
-        <input type="time" id="inpTime">
+        <label>Saat</label>
+        <div class="days-row" id="timeRow"></div>
       </div>
     </div>
   </section>
@@ -270,10 +270,20 @@
     });
     daysRow.appendChild(el);
   });
-  const inpTime = document.getElementById('inpTime');
-  inpTime.addEventListener('change', () => {
-    state.time = inpTime.value;
-    maybeAdvanceFromDatetime();
+  const timeRow = document.getElementById('timeRow');
+  const TIME_OPTIONS = ['13:10', '19:00', '21:00'];
+  TIME_OPTIONS.forEach(t => {
+    const el = document.createElement('button');
+    el.className = 'day-pill';
+    el.type = 'button';
+    el.innerHTML = `<div class="dnum" style="font-size:17px;">${t}</div>`;
+    el.addEventListener('click', () => {
+      timeRow.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+      state.time = t;
+      maybeAdvanceFromDatetime();
+    });
+    timeRow.appendChild(el);
   });
   function maybeAdvanceFromDatetime(){
     if (state.date && state.time){
