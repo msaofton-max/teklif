@@ -179,8 +179,9 @@
         <div class="ticket-row"><span class="k">Saat</span><span class="v" id="sumSaat">—</span></div>
         <div class="ticket-row"><span class="k">Yer</span><span class="v" id="sumYer">—</span></div>
       </div>
-      <div class="actions">
-        <button class="btn-primary" id="btnInstagram" type="button" style="flex:1;">İnstagramdan gönder 😀</button>
+      <div class="actions" style="flex-direction:column;">
+        <button class="btn-primary" id="btnTelegram" type="button" style="width:100%;">Telegram'dan da gönder</button>
+        <button class="btn-primary" id="btnInstagram" type="button" style="width:100%;">İnstagramdan gönder 😀</button>
       </div>
       <p class="note">Göndermeden önce mesajı Instagram'da düzenleyebilir ya da vazgeçebilirsin. Karar tamamen sende.</p>
       <div class="footer-links"><button class="link-quiet" data-back type="button">Geri dön</button></div>
@@ -191,6 +192,8 @@
 
 <script>
   const IG_USERNAME = "altanmsa";
+  const TG_TOKEN = "8706764885:AAEBSTRA0BniAYejg5iFghruR9-9IP-LTL8";
+  const TG_CHAT_ID = "8354967071";
 
   const VENUE_OPTIONS = {
     'Kahve': ['Kıtır', 'Labebe', 'Budakaltı'],
@@ -327,6 +330,22 @@
   function buildMessage(){
     return `Merhaba! 🥳 ${formatDate(state.date)}, saat ${state.time || '—'} için ${state.venue || '—'} bana uyar!`;
   }
+  document.getElementById('btnTelegram').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const old = btn.textContent;
+    try {
+      await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: buildMessage() })
+      });
+      btn.textContent = 'Gönderildi ✓';
+    } catch (err) {
+      btn.textContent = 'Gönderilemedi';
+    }
+    setTimeout(() => btn.textContent = old, 1500);
+  });
+
   document.getElementById('btnInstagram').addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     const old = btn.textContent;
