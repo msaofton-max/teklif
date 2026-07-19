@@ -65,6 +65,30 @@
   .btn-primary{ background: var(--sun); color: #FBF6EF; flex: 1.3; position: relative; overflow: hidden; }
   .btn-ghost{ background: transparent; border-color: var(--line); color: var(--ink-soft); flex: 1; }
 
+  .nope-placeholder{
+    flex: 1;
+    min-width: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  #btnNo.floating-nope{
+    position: absolute;
+    flex: none;
+    margin: 0;
+    z-index: 10;
+    touch-action: none;
+    user-select: none;
+    will-change: left, top;
+    transition:
+      left .24s cubic-bezier(.22,.8,.35,1),
+      top .24s cubic-bezier(.22,.8,.35,1),
+      transform .15s ease,
+      background .2s ease,
+      border-color .2s ease,
+      opacity .2s ease;
+  }
+
   .btn-primary.pulse::after{ content:''; position:absolute; inset:0; background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, transparent 60%); animation: burst .55s ease-out; }
   @keyframes burst{ from{ opacity:1; transform: scale(0.2);} to{ opacity:0; transform: scale(2.2);} }
 
@@ -241,8 +265,193 @@
   document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', back));
   document.querySelectorAll('[data-decline]').forEach(b => b.addEventListener('click', () => show('decline')));
 
-  // ekran 1
-  document.getElementById('btnNo').addEventListener('click', () => show('decline'));
+  // ekran 1 — her dokunuşta kaçan "Nope" butonu
+  const btnNo = document.getElementById('btnNo');
+  const btnYes = document.getElementById('btnYes');
+  const introScreen = screens.intro;
+
+  let nopeIsFloating = false;
+
+  function rectanglesOverlap(a, b, gap = 8){
+    return !(
+      a.right + gap <= b.left ||
+      a.left >= b.right + gap ||
+      a.bottom + gap <= b.top ||
+      a.top >= b.bottom + gap
+    );
+  }
+
+  function makeNopeFloating(){
+    if (nopeIsFloating) return;
+
+    const buttonRect = btnNo.getBoundingClientRect();
+    const introRect = introScreen.getBoundingClientRect();
+
+    const placeholder = document.createElement('span');
+    placeholder.className = 'nope-placeholder';
+    placeholder.setAttribute('aria-hidden', 'true');
+    placeholder.style.height = `${buttonRect.height}px`;
+
+    btnNo.insertAdjacentElement('beforebegin', placeholder);
+
+    btnNo.style.width = `${buttonRect.width}px`;
+    btnNo.style.height = `${buttonRect.height}px`;
+    btnNo.style.left = `${buttonRect.left - introRect.left}px`;
+    btnNo.style.top = `${buttonRect.top - introRect.top}px`;
+
+    btnNo.classList.add('floating-nope');
+    nopeIsFloating = true;
+  }
+
+  function moveNopeButton(){
+    makeNopeFloating();
+
+    const introRect = introScreen.getBoundingClientRect();
+    const buttonRect = btnNo.getBoundingClientRect();
+    const yesRect = btnYes.getBoundingClientRect();
+    const closeRect = introScreen.querySelector('.close-btn')?.getBoundingClientRect();
+
+    const fingerDistance = Math.min(
+      82,
+      Math.max(68, window.innerWidth * 0.18)
+    );
+
+    const edgeMargin = 12;
+    const minLeft = edgeMargin;
+    const minTop = edgeMargin;
+    const maxLeft = Math.max(minLeft, introRect.width - buttonRect.width - edgeMargin);
+    const maxTop = Math.max(minTop, introRect.height - buttonRect.height - edgeMargin);
+
+    const currentLeft = parseFloat(btnNo.style.left);
+    const currentTop = parseFloat(btnNo.style.top);
+
+    const validPositions = [];
+    const randomStartAngle = Math.random() * Math.PI * 2;
+
+    for (let i = 0; i < 48; i++){
+      const angle = randomStartAngle + i * ((Math.PI * 2) / 48);
+      const nextLeft = currentLeft + Math.cos(angle) * fingerDistance;
+      const nextTop = currentTop + Math.sin(angle) * fingerDistance;
+
+      if (
+        nextLeft < minLeft ||
+        nextLeft > maxLeft ||
+        nextTop < minTop ||
+        nextTop > maxTop
+      ){
+        continue;
+      }
+
+      const candidateRect = {
+        left: introRect.left + nextLeft,
+        top: introRect.top + nextTop,
+        right: introRect.left + nextLeft + buttonRect.width,
+        bottom: introRect.top + nextTop + buttonRect.height
+      };
+
+      if (rectanglesOverlap(candidateRect, yesRect, 10)) continue;
+      if (closeRect && rectanglesOverlap(candidateRect, closeRect, 10)) continue;
+
+      validPositions.push({ left: nextLeft, top: nextTop });
+    }
+
+    if (validPositions.length){
+      const selected = validPositions[
+        Math.floor(Math.random() * validPositions.length)
+      ];
+
+      btnNo.style.left = `${selected.left}px`;
+      btnNo.style.top = `${selected.top}px`;
+      return;
+    }
+
+    // Çok küçük ekranlar için güvenli yedek konum
+    for (let i = 0; i < 24; i++){
+      const angle = Math.random() * Math.PI * 2;
+      const distance = fingerDistance * (0.55 + Math.random() * 0.35);
+
+      const nextLeft = Math.min(
+        maxLeft,
+        Math.max(minLeft, currentLeft + Math.cos(angle) * distance)
+      );
+
+      const nextTop = Math.min(
+        maxTop,
+        Math.max(minTop, currentTop + Math.sin(angle) * distance)
+      );
+
+      const candidateRect = {
+        left: introRect.left + nextLeft,
+        top: introRect.top + nextTop,
+        right: introRect.left + nextLeft + buttonRect.width,
+        bottom: introRect.top + nextTop + buttonRect.height
+      };
+
+      if (rectanglesOverlap(candidateRect, yesRect, 8)) continue;
+      if (closeRect && rectanglesOverlap(candidateRect, closeRect, 8)) continue;
+
+      btnNo.style.left = `${nextLeft}px`;
+      btnNo.style.top = `${nextTop}px`;
+      return;
+    }
+
+    // Son çare: ekran sınırları içinde rastgele bir nokta
+    btnNo.style.left = `${minLeft + Math.random() * Math.max(0, maxLeft - minLeft)}px`;
+    btnNo.style.top = `${minTop + Math.random() * Math.max(0, maxTop - minTop)}px`;
+  }
+
+  // İlk dokunuş dahil her dokunuşta, parmak kalkmadan yer değiştirir.
+  btnNo.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    moveNopeButton();
+  });
+
+  // pointerdown sonrasında oluşan click olayının başka işlem yapmasını engeller.
+  btnNo.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  });
+
+  // Klavye erişilebilirliği
+  btnNo.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' '){
+      event.preventDefault();
+      moveNopeButton();
+    }
+  });
+
+  // Telefon döndürülürse butonu görünür alan içinde tut.
+  window.addEventListener('resize', () => {
+    if (!nopeIsFloating) return;
+
+    requestAnimationFrame(() => {
+      const introRect = introScreen.getBoundingClientRect();
+      const buttonRect = btnNo.getBoundingClientRect();
+      const edgeMargin = 12;
+
+      const maxLeft = Math.max(
+        edgeMargin,
+        introRect.width - buttonRect.width - edgeMargin
+      );
+
+      const maxTop = Math.max(
+        edgeMargin,
+        introRect.height - buttonRect.height - edgeMargin
+      );
+
+      btnNo.style.left = `${Math.min(
+        maxLeft,
+        Math.max(edgeMargin, parseFloat(btnNo.style.left))
+      )}px`;
+
+      btnNo.style.top = `${Math.min(
+        maxTop,
+        Math.max(edgeMargin, parseFloat(btnNo.style.top))
+      )}px`;
+    });
+  });
+
   document.getElementById('btnYes').addEventListener('click', (e) => {
     e.currentTarget.classList.add('pulse');
     setTimeout(() => show('type'), 260);
